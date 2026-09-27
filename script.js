@@ -1,274 +1,456 @@
 /* =========================================================
-   GOOGLE APPS SCRIPT CONNECTION
+   CONFIGURATION
 ========================================================= */
 
-const GOOGLE_SCRIPT_URL =
-    "https://script.google.com/macros/s/AKfycbyMXxIzDaMR-yCFq3FJUyUYgjWnXy-PKU_ZnsOu4GOyCNMdHVapobi4sMt-Y6oiFpS6Ow/exec";
+const CONFIG = {
+    googleScriptUrl:
+        "https://script.google.com/macros/s/AKfycbyMXxIzDaMR-yCFq3FJUyUYgjWnXy-PKU_ZnsOu4GOyCNMdHVapobi4sMt-Y6oiFpS6Ow/exec",
+
+    successMessage:
+        "Thank you! Your requirement has been submitted successfully. We will contact you shortly.",
+
+    errorMessage:
+        "Something went wrong. Please try again or contact us directly.",
+
+    successDisplayTime: 6000
+};
 
 
 /* =========================================================
-   PAGE LOAD
+   DOM ELEMENTS
 ========================================================= */
 
-document.addEventListener("DOMContentLoaded", function () {
-
-    const form =
-        document.getElementById("queryForm");
-
-    const successMessage =
-        document.getElementById("successMessage");
-
-    const menuButton =
-        document.getElementById("menuButton");
+const elements = {
+    form: document.getElementById("queryForm"),
+    successMessage: document.getElementById("successMessage"),
+    menuButton: document.getElementById("menuButton")
+};
 
 
-    /* =====================================================
-       MOBILE MENU
-    ===================================================== */
+/* =========================================================
+   INITIALIZE
+========================================================= */
 
-    if (menuButton) {
+document.addEventListener("DOMContentLoaded", initialize);
 
-        menuButton.addEventListener(
-            "click",
-            function () {
 
-                alert(
-                    "Please use the navigation links or scroll through the page."
-                );
+function initialize() {
 
-            }
+    setupFormSubmission();
+    setupMobileMenu();
+
+}
+
+
+/* =========================================================
+   FORM SUBMISSION
+========================================================= */
+
+function setupFormSubmission() {
+
+    if (!elements.form) {
+        return;
+    }
+
+    elements.form.addEventListener(
+        "submit",
+        handleFormSubmit
+    );
+
+}
+
+
+/* =========================================================
+   HANDLE FORM SUBMIT
+========================================================= */
+
+async function handleFormSubmit(event) {
+
+    event.preventDefault();
+
+    const formData = getFormData();
+
+    const validation = validateForm(formData);
+
+    if (!validation.valid) {
+
+        showValidationError(validation.message);
+
+        return;
+    }
+
+    const submitButton =
+        elements.form.querySelector(".submit-button");
+
+    const originalButtonText =
+        submitButton.innerHTML;
+
+    setButtonState(
+        submitButton,
+        true,
+        "Submitting..."
+    );
+
+    try {
+
+        await submitLead(formData);
+
+        handleSubmissionSuccess(
+            submitButton,
+            originalButtonText
+        );
+
+    } catch (error) {
+
+        handleSubmissionError(
+            submitButton,
+            originalButtonText,
+            error
         );
 
     }
 
+}
 
-    /* =====================================================
-       FORM SUBMISSION
-    ===================================================== */
 
-    if (!form) {
-        return;
+/* =========================================================
+   GET FORM DATA
+========================================================= */
+
+function getFormData() {
+
+    return {
+        name: getValue("name"),
+        phone: getValue("phone"),
+        email: getValue("email"),
+        service: getValue("service"),
+        message: getValue("message")
+    };
+
+}
+
+
+/* =========================================================
+   GET FIELD VALUE
+========================================================= */
+
+function getValue(fieldId) {
+
+    const field =
+        document.getElementById(fieldId);
+
+    return field
+        ? field.value.trim()
+        : "";
+
+}
+
+
+/* =========================================================
+   VALIDATION
+========================================================= */
+
+function validateForm(data) {
+
+    const requiredFields = [
+        {
+            value: data.name,
+            message: "Please enter your full name."
+        },
+        {
+            value: data.phone,
+            message: "Please enter your mobile number."
+        },
+        {
+            value: data.email,
+            message: "Please enter your email address."
+        },
+        {
+            value: data.service,
+            message: "Please select a service."
+        },
+        {
+            value: data.message,
+            message: "Please describe your requirement."
+        }
+    ];
+
+
+    /* ---------------------------------------------
+       REQUIRED FIELD CHECK
+    --------------------------------------------- */
+
+    for (const field of requiredFields) {
+
+        if (!field.value) {
+
+            return {
+                valid: false,
+                message: field.message
+            };
+
+        }
+
     }
 
 
-    form.addEventListener(
-        "submit",
-        async function (event) {
+    /* ---------------------------------------------
+       PHONE VALIDATION
+    --------------------------------------------- */
 
-            event.preventDefault();
+    if (!isValidPhone(data.phone)) {
 
+        return {
+            valid: false,
+            message:
+                "Please enter a valid 10-digit mobile number."
+        };
 
-            /* ---------------------------------------------
-               GET FORM VALUES
-            --------------------------------------------- */
+    }
 
-            const name =
-                document
-                    .getElementById("name")
-                    .value
-                    .trim();
 
-            const email =
-                document
-                    .getElementById("email")
-                    .value
-                    .trim();
+    /* ---------------------------------------------
+       EMAIL VALIDATION
+    --------------------------------------------- */
 
-            const phone =
-                document
-                    .getElementById("phone")
-                    .value
-                    .trim();
+    if (!isValidEmail(data.email)) {
 
-            const service =
-                document
-                    .getElementById("service")
-                    .value;
+        return {
+            valid: false,
+            message:
+                "Please enter a valid email address."
+        };
 
-            const message =
-                document
-                    .getElementById("message")
-                    .value
-                    .trim();
+    }
 
 
-            /* ---------------------------------------------
-               VALIDATION
-            --------------------------------------------- */
+    return {
+        valid: true,
+        message: ""
+    };
 
-            if (
-                !name ||
-                !email ||
-                !phone ||
-                !service ||
-                !message
-            ) {
+}
 
-                alert(
-                    "Please fill all required fields."
-                );
 
-                return;
-            }
+/* =========================================================
+   PHONE VALIDATION
+========================================================= */
 
+function isValidPhone(phone) {
 
-            /* ---------------------------------------------
-               PHONE VALIDATION
-            --------------------------------------------- */
+    return /^[0-9]{10}$/.test(phone);
 
-            if (!/^[0-9]{10}$/.test(phone)) {
+}
 
-                alert(
-                    "Please enter a valid 10-digit mobile number."
-                );
 
-                return;
-            }
+/* =========================================================
+   EMAIL VALIDATION
+========================================================= */
 
+function isValidEmail(email) {
 
-            /* ---------------------------------------------
-               EMAIL VALIDATION
-            --------------------------------------------- */
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-            const emailPattern =
-                /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+}
 
-            if (!emailPattern.test(email)) {
 
-                alert(
-                    "Please enter a valid email address."
-                );
+/* =========================================================
+   SUBMIT LEAD TO GOOGLE APPS SCRIPT
+========================================================= */
 
-                return;
-            }
+async function submitLead(data) {
 
+    const response = await fetch(
+        CONFIG.googleScriptUrl,
+        {
+            method: "POST",
 
-            /* ---------------------------------------------
-               BUTTON
-            --------------------------------------------- */
+            mode: "no-cors",
 
-            const submitButton =
-                form.querySelector(
-                    ".submit-button"
-                );
+            headers: {
+                "Content-Type":
+                    "text/plain;charset=utf-8"
+            },
 
-            const originalButtonText =
-                submitButton.innerHTML;
+            body: JSON.stringify(data)
+        }
+    );
 
 
-            submitButton.disabled = true;
+    /*
+       With no-cors, the browser does not expose the
+       response body/status to JavaScript.
 
-            submitButton.innerHTML =
-                "Submitting...";
+       If fetch completes without throwing an error,
+       we treat the request as submitted.
+    */
 
+    return response;
 
-            /* ---------------------------------------------
-               DATA FOR GOOGLE SHEET
-            --------------------------------------------- */
+}
 
-            const leadData = {
 
-                name: name,
+/* =========================================================
+   SUCCESS HANDLER
+========================================================= */
 
-                phone: phone,
+function handleSubmissionSuccess(
+    submitButton,
+    originalButtonText
+) {
 
-                email: email,
+    elements.form.reset();
 
-                service: service,
+    showSuccessMessage(
+        CONFIG.successMessage
+    );
 
-                message: message
+    setButtonState(
+        submitButton,
+        true,
+        "Query Submitted ✓"
+    );
 
-            };
 
+    setTimeout(
+        function () {
 
-            /* ---------------------------------------------
-               SEND TO GOOGLE APPS SCRIPT
-            --------------------------------------------- */
+            hideSuccessMessage();
 
-            try {
+            setButtonState(
+                submitButton,
+                false,
+                originalButtonText
+            );
 
-                await fetch(
-                    GOOGLE_SCRIPT_URL,
-                    {
-                        method: "POST",
+        },
+        CONFIG.successDisplayTime
+    );
 
-                        mode: "no-cors",
+}
 
-                        headers: {
-                            "Content-Type":
-                                "text/plain;charset=utf-8"
-                        },
 
-                        body:
-                            JSON.stringify(
-                                leadData
-                            )
-                    }
-                );
+/* =========================================================
+   ERROR HANDLER
+========================================================= */
 
+function handleSubmissionError(
+    submitButton,
+    originalButtonText,
+    error
+) {
 
-                /* -----------------------------------------
-                   SUCCESS
-                ----------------------------------------- */
+    console.error(
+        "Lead submission error:",
+        error
+    );
 
-                form.reset();
+    hideSuccessMessage();
 
+    alert(CONFIG.errorMessage);
 
-                successMessage.innerText =
-                    "Thank you! Your requirement has been submitted successfully. We will contact you shortly.";
+    setButtonState(
+        submitButton,
+        false,
+        originalButtonText
+    );
 
+}
 
-                successMessage.style.display =
-                    "block";
 
+/* =========================================================
+   BUTTON STATE
+========================================================= */
 
-                submitButton.innerHTML =
-                    "Query Submitted ✓";
+function setButtonState(
+    button,
+    disabled,
+    text
+) {
 
+    if (!button) {
+        return;
+    }
 
-                /* -----------------------------------------
-                   AUTO RESET
-                ----------------------------------------- */
+    button.disabled = disabled;
+    button.innerHTML = text;
 
-                setTimeout(
-                    function () {
+}
 
-                        successMessage.style.display =
-                            "none";
 
-                        submitButton.disabled =
-                            false;
+/* =========================================================
+   SUCCESS MESSAGE
+========================================================= */
 
-                        submitButton.innerHTML =
-                            originalButtonText;
+function showSuccessMessage(message) {
 
-                    },
-                    6000
-                );
+    if (!elements.successMessage) {
+        return;
+    }
 
+    elements.successMessage.textContent =
+        message;
 
-            } catch (error) {
+    elements.successMessage.style.display =
+        "block";
 
-                console.error(
-                    "Submission Error:",
-                    error
-                );
+}
 
 
-                alert(
-                    "Something went wrong. Please try again or contact us directly."
-                );
+/* =========================================================
+   HIDE SUCCESS MESSAGE
+========================================================= */
 
+function hideSuccessMessage() {
 
-                submitButton.disabled =
-                    false;
+    if (!elements.successMessage) {
+        return;
+    }
 
-                submitButton.innerHTML =
-                    originalButtonText;
+    elements.successMessage.style.display =
+        "none";
 
-            }
+}
+
+
+/* =========================================================
+   VALIDATION ERROR
+========================================================= */
+
+function showValidationError(message) {
+
+    hideSuccessMessage();
+
+    alert(message);
+
+}
+
+
+/* =========================================================
+   MOBILE MENU
+========================================================= */
+
+function setupMobileMenu() {
+
+    if (!elements.menuButton) {
+        return;
+    }
+
+    elements.menuButton.addEventListener(
+        "click",
+        function () {
+
+            /*
+               Mobile navigation can be upgraded here later.
+               Keeping this separate prevents menu logic from
+               interfering with form submission.
+            */
+
+            alert(
+                "Please use the navigation links or scroll through the page."
+            );
 
         }
     );
 
-});
+}
