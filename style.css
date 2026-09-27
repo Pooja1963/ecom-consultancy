@@ -1,536 +1,1354 @@
-/* =====================================================
-   CONFIGURATION
-===================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-const CONFIG = {
+:root {
+    --navy: #071b31;
+    --navy-light: #0c2943;
 
-    googleScriptUrl:
-        "https://script.google.com/macros/s/AKfycbyMXxIzDaMR-yCFq3FJUyUYgjWnXy-PKU_ZnsOu4GOyCNMdHVapobi4sMt-Y6oiFpS6Ow/exec",
+    --gold: #e8a92f;
+    --gold-light: #f5c45b;
 
-    successMessage:
-        "Thank you! Your requirement has been submitted successfully. We will contact you shortly.",
+    --text: #172235;
+    --muted: #596272;
 
-    errorMessage:
-        "Something went wrong. Please try again or contact us directly.",
+    --cream: #fbf7ef;
 
-    successDisplayTime: 6000
+    --border: #e3e7ec;
 
-};
+    --white: #ffffff;
+}
 
+html {
+    scroll-behavior: smooth;
+}
 
-/* =====================================================
-   DOM
-===================================================== */
+body {
+    font-family: "Inter", sans-serif;
+    color: var(--text);
+    background: #ffffff;
+    line-height: 1.5;
+}
 
-const elements = {
+a {
+    text-decoration: none;
+    color: inherit;
+}
 
-    form:
-        document.getElementById("queryForm"),
+button,
+input,
+textarea,
+select {
+    font-family: inherit;
+}
 
-    successMessage:
-        document.getElementById("successMessage"),
-
-    menuButton:
-        document.getElementById("menuButton")
-
-};
-
-
-/* =====================================================
-   INITIALIZE
-===================================================== */
-
-document.addEventListener(
-    "DOMContentLoaded",
-    initialize
-);
-
-
-function initialize() {
-
-    setupFormSubmission();
-
-    setupMobileMenu();
-
+.container {
+    width: min(1180px, calc(100% - 80px));
+    margin: 0 auto;
 }
 
 
 /* =====================================================
-   FORM SUBMISSION
+   HEADER
 ===================================================== */
 
-function setupFormSubmission() {
+.header {
+    height: 68px;
 
-    if (!elements.form) {
-        return;
-    }
+    background: #ffffff;
 
-    elements.form.addEventListener(
-        "submit",
-        handleFormSubmit
-    );
+    border-bottom: 1px solid #e8e8e8;
 
+    position: sticky;
+
+    top: 0;
+
+    z-index: 1000;
+}
+
+.header-inner {
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 25px;
 }
 
 
-/* =====================================================
-   HANDLE FORM
-===================================================== */
+/* LOGO */
 
-async function handleFormSubmit(event) {
+.brand {
+    display: flex;
 
-    event.preventDefault();
+    align-items: center;
+
+    gap: 10px;
+
+    flex-shrink: 0;
+}
+
+.brand-icon {
+    width: 40px;
+    height: 43px;
+
+    position: relative;
+}
+
+.bar {
+    position: absolute;
+
+    bottom: 0;
+
+    width: 7px;
+
+    background: var(--navy);
+}
+
+.bar-1 {
+    left: 2px;
+    height: 16px;
+}
+
+.bar-2 {
+    left: 13px;
+    height: 26px;
+}
+
+.bar-3 {
+    left: 24px;
+    height: 36px;
+}
+
+.arrow-line {
+    position: absolute;
+
+    width: 25px;
+
+    height: 4px;
+
+    background: var(--gold);
+
+    transform: rotate(-30deg);
+
+    top: 6px;
+
+    left: 9px;
+}
+
+.arrow-head {
+    position: absolute;
+
+    width: 10px;
+
+    height: 10px;
+
+    border-top: 4px solid var(--gold);
+
+    border-right: 4px solid var(--gold);
+
+    transform: rotate(15deg);
+
+    top: 1px;
+
+    right: 0;
+}
+
+.brand-name {
+    display: flex;
+
+    flex-direction: column;
+
+    line-height: 1.02;
+}
+
+.brand-name strong {
+    font-size: 14px;
+
+    letter-spacing: .2px;
+}
+
+.brand-name span {
+    font-size: 14px;
+
+    font-weight: 800;
+}
 
 
-    const formData =
-        getFormData();
+/* NAV */
+
+.navigation {
+    display: flex;
+
+    align-items: center;
+
+    gap: 27px;
+
+    font-size: 11px;
+
+    font-weight: 600;
+}
+
+.navigation a {
+    position: relative;
+
+    color: #101827;
+
+    padding: 25px 0 21px;
+}
+
+.navigation a.active::after {
+    content: "";
+
+    position: absolute;
+
+    height: 2px;
+
+    background: var(--gold);
+
+    left: 0;
+
+    right: 0;
+
+    bottom: 9px;
+}
 
 
-    const validation =
-        validateForm(formData);
+/* HEADER CTA */
 
-
-    if (!validation.valid) {
-
-        showValidationError(
-            validation.message
+.header-cta {
+    background:
+        linear-gradient(
+            180deg,
+            #f5c45b,
+            #e8a92f
         );
 
-        return;
-    }
+    color: #111111;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    padding: 12px 21px;
+
+    border-radius: 5px;
+
+    white-space: nowrap;
+
+    box-shadow:
+        0 3px 10px rgba(228,164,45,.2);
+}
+
+.mobile-menu {
+    display: none;
+
+    border: 0;
+
+    background: transparent;
+
+    font-size: 24px;
+
+    cursor: pointer;
+}
 
 
-    const submitButton =
-        elements.form.querySelector(
-            ".submit-button"
+/* =====================================================
+   HERO
+===================================================== */
+
+.hero {
+    position: relative;
+
+    min-height: 420px;
+
+    background:
+        linear-gradient(
+            105deg,
+            #061a2e 0%,
+            #071d33 55%,
+            #0d3048 100%
         );
 
+    overflow: hidden;
 
-    const originalButtonText =
-        submitButton.innerHTML;
+    color: white;
+}
+
+.hero-inner {
+    min-height: 420px;
+
+    display: grid;
+
+    grid-template-columns: 50% 50%;
+
+    align-items: stretch;
+
+    position: relative;
+}
 
 
-    setButtonState(
-        submitButton,
-        true,
-        "Submitting..."
-    );
+/* HERO LEFT */
+
+.hero-content {
+    padding: 49px 0 38px;
+
+    position: relative;
+
+    z-index: 5;
+}
+
+.hero-eyebrow {
+    font-size: 11px;
+
+    letter-spacing: .55px;
+
+    color: #e4ebf2;
+
+    margin-bottom: 12px;
+}
+
+.hero h1 {
+    font-family: "Playfair Display", serif;
+
+    font-size: clamp(43px, 4.5vw, 59px);
+
+    line-height: 1.02;
+
+    margin-bottom: 15px;
+
+    max-width: 650px;
+}
+
+.hero h1 span {
+    color: var(--gold-light);
+
+    display: inline;
+}
+
+.hero-text {
+    max-width: 600px;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+    color: #f1f4f7;
+
+    margin-bottom: 20px;
+}
 
 
-    try {
+/* HERO BUTTONS */
 
-        await submitLead(formData);
+.hero-buttons {
+    display: flex;
 
+    gap: 11px;
 
-        handleSubmissionSuccess(
-            submitButton,
-            originalButtonText
+    margin-bottom: 26px;
+}
+
+.hero-primary,
+.hero-secondary {
+    min-height: 43px;
+
+    padding: 0 20px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 5px;
+
+    font-size: 12px;
+
+    font-weight: 800;
+}
+
+.hero-primary {
+    background:
+        linear-gradient(
+            180deg,
+            #f5c45b,
+            #e8a92f
         );
 
+    color: #111111;
+}
 
-    } catch (error) {
+.hero-primary span {
+    margin-left: 12px;
 
-        handleSubmissionError(
-            submitButton,
-            originalButtonText,
-            error
+    font-size: 17px;
+}
+
+.hero-secondary {
+    border: 1px solid rgba(255,255,255,.95);
+
+    color: white;
+
+    background: rgba(0,0,0,.03);
+}
+
+
+/* TRUST */
+
+.hero-trust {
+    display: flex;
+
+    gap: 27px;
+}
+
+.trust-item {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+.trust-icon {
+    color: var(--gold-light);
+
+    font-size: 25px;
+
+    line-height: 1;
+}
+
+.trust-item strong,
+.trust-item span {
+    display: block;
+
+    font-size: 11px;
+}
+
+.trust-item span {
+    color: #e2e8ee;
+}
+
+
+/* =====================================================
+   HERO REALISTIC IMAGE
+===================================================== */
+
+.hero-visual {
+    position: relative;
+
+    min-height: 420px;
+
+    overflow: hidden;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+}
+
+.hero-image {
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+    object-position: center;
+
+    display: block;
+
+    transform: scale(1.01);
+}
+
+
+/* soft blending on left edge */
+
+.hero-visual::before {
+    content: "";
+
+    position: absolute;
+
+    z-index: 2;
+
+    left: 0;
+
+    top: 0;
+
+    bottom: 0;
+
+    width: 150px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #071d33 0%,
+            rgba(7,29,51,.75) 30%,
+            rgba(7,29,51,0) 100%
         );
 
+    pointer-events: none;
+}
+
+
+/* =====================================================
+   SERVICES
+===================================================== */
+
+.services-section {
+    padding: 26px 0 30px;
+
+    background: white;
+}
+
+.service-layout {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        310px;
+
+    gap: 12px;
+
+    align-items: start;
+}
+
+.section-title {
+    margin-bottom: 13px;
+}
+
+.section-title h2 {
+    font-family: "Playfair Display", serif;
+
+    font-size: 31px;
+
+    color: var(--navy);
+
+    line-height: 1.1;
+}
+
+.section-title p {
+    font-size: 14px;
+
+    color: #5c6470;
+
+    margin-top: 3px;
+}
+
+.service-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 10px;
+}
+
+.service-card {
+    min-height: 125px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 7px;
+
+    padding: 17px;
+
+    background: white;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.035);
+
+    transition: .2s;
+}
+
+.service-card:hover {
+    transform: translateY(-2px);
+
+    border-color: #d8aa4d;
+
+    box-shadow:
+        0 8px 20px rgba(7,27,49,.08);
+}
+
+.service-icon {
+    color: var(--navy);
+
+    font-size: 25px;
+
+    line-height: 1;
+
+    margin-bottom: 7px;
+}
+
+.service-card h3 {
+    color: #101b2c;
+
+    font-size: 12px;
+
+    line-height: 1.35;
+
+    margin-bottom: 7px;
+}
+
+.service-card p {
+    color: #626b78;
+
+    font-size: 10px;
+
+    line-height: 1.45;
+}
+
+
+/* =====================================================
+   QUERY FORM
+===================================================== */
+
+.query-card {
+    background: white;
+
+    border: 1px solid #e2e6eb;
+
+    border-radius: 7px;
+
+    padding: 17px;
+
+    box-shadow:
+        0 4px 18px rgba(7,27,49,.08);
+}
+
+.query-heading h2 {
+    font-family: "Playfair Display", serif;
+
+    font-size: 21px;
+
+    color: var(--navy);
+
+    line-height: 1.1;
+}
+
+.query-heading p {
+    font-size: 10px;
+
+    color: #5c6470;
+
+    margin: 4px 0 13px;
+}
+
+.input-box {
+    height: 35px;
+
+    border: 1px solid #dce1e7;
+
+    border-radius: 5px;
+
+    margin-bottom: 8px;
+
+    display: flex;
+
+    align-items: center;
+
+    position: relative;
+
+    background: white;
+}
+
+.input-icon {
+    width: 33px;
+
+    flex-shrink: 0;
+
+    text-align: center;
+
+    color: #566275;
+
+    font-size: 14px;
+}
+
+.input-box input,
+.input-box select,
+.input-box textarea {
+    width: 100%;
+
+    height: 100%;
+
+    border: 0;
+
+    outline: 0;
+
+    background: transparent;
+
+    color: #3d4653;
+
+    font-size: 10px;
+
+    padding-right: 10px;
+}
+
+.input-box textarea {
+    resize: none;
+
+    padding-top: 9px;
+}
+
+.textarea-box {
+    height: 62px;
+
+    align-items: flex-start;
+}
+
+.textarea-box .input-icon {
+    padding-top: 9px;
+}
+
+.select-arrow {
+    position: absolute;
+
+    right: 10px;
+
+    pointer-events: none;
+
+    color: #5e6875;
+}
+
+.upload-small {
+    height: 42px;
+
+    border: 1px dashed #cdd3db;
+
+    background: #fafafa;
+
+    border-radius: 5px;
+
+    margin-bottom: 8px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 7px;
+
+    position: relative;
+
+    overflow: hidden;
+}
+
+.upload-small > span {
+    font-size: 17px;
+}
+
+.upload-small strong,
+.upload-small small {
+    display: block;
+}
+
+.upload-small strong {
+    font-size: 9px;
+}
+
+.upload-small small {
+    font-size: 7px;
+
+    color: #87909d;
+}
+
+.upload-small input {
+    position: absolute;
+
+    inset: 0;
+
+    opacity: 0;
+
+    cursor: pointer;
+}
+
+.submit-button {
+    width: 100%;
+
+    height: 40px;
+
+    border: 0;
+
+    border-radius: 5px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #f5c45b,
+            #e8a92f
+        );
+
+    color: #111;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 12px;
+}
+
+.submit-button:disabled {
+    opacity: .65;
+
+    cursor: not-allowed;
+}
+
+.success-message {
+    display: none;
+
+    padding: 8px;
+
+    margin-top: 8px;
+
+    border-radius: 4px;
+
+    background: #edf8ef;
+
+    color: #28743d;
+
+    font-size: 9px;
+
+    text-align: center;
+}
+
+.form-security {
+    text-align: center;
+
+    font-size: 8px;
+
+    color: #707986;
+
+    padding-top: 8px;
+}
+
+
+/* =====================================================
+   HOW IT WORKS
+===================================================== */
+
+.how-section {
+    padding: 18px 0 28px;
+
+    background: white;
+}
+
+.center-heading {
+    text-align: center;
+
+    margin-bottom: 20px;
+}
+
+.center-heading h2 {
+    font-family: "Playfair Display", serif;
+
+    color: var(--navy);
+
+    font-size: 28px;
+
+    line-height: 1.15;
+}
+
+.center-heading p {
+    font-size: 13px;
+
+    color: #626b78;
+}
+
+.steps {
+    display: grid;
+
+    grid-template-columns:
+        1fr 25px 1fr 25px 1fr;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+.step {
+    display: grid;
+
+    grid-template-columns:
+        35px 45px 1fr;
+
+    gap: 10px;
+
+    align-items: center;
+}
+
+.step-number {
+    width: 35px;
+
+    height: 35px;
+
+    background: var(--navy);
+
+    color: white;
+
+    border-radius: 50%;
+
+    display: grid;
+
+    place-items: center;
+
+    font-weight: 800;
+
+    font-size: 13px;
+}
+
+.step-icon {
+    font-size: 31px;
+
+    color: var(--navy);
+}
+
+.step h3 {
+    font-size: 12px;
+
+    color: #152033;
+
+    margin-bottom: 4px;
+}
+
+.step p {
+    font-size: 10px;
+
+    color: #68717e;
+
+    line-height: 1.4;
+}
+
+.step-arrow {
+    font-size: 29px;
+
+    color: var(--navy);
+
+    text-align: center;
+}
+
+
+/* =====================================================
+   WHY US
+===================================================== */
+
+.why-section {
+    padding: 20px 0 25px;
+
+    background: var(--cream);
+}
+
+.why-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 35px;
+}
+
+.why-item {
+    text-align: center;
+}
+
+.why-icon {
+    color: #c88615;
+
+    font-size: 38px;
+
+    line-height: 1;
+
+    margin-bottom: 10px;
+}
+
+.why-item h3 {
+    font-size: 13px;
+
+    color: var(--navy);
+
+    margin-bottom: 5px;
+}
+
+.why-item p {
+    font-size: 10px;
+
+    color: #555e6b;
+
+    line-height: 1.45;
+}
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.footer {
+    background:
+        linear-gradient(
+            135deg,
+            #06192b,
+            #09263d
+        );
+
+    color: white;
+}
+
+.footer-grid {
+    padding: 28px 0 25px;
+
+    display: grid;
+
+    grid-template-columns:
+        1.5fr 1fr 1fr 1fr;
+
+    gap: 35px;
+}
+
+.footer-brand-title {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    margin-bottom: 10px;
+}
+
+.footer-brand-title strong {
+    display: block;
+
+    font-size: 14px;
+
+    line-height: 1.05;
+}
+
+.footer-brand-icon {
+    width: 34px;
+
+    height: 34px;
+
+    display: flex;
+
+    align-items: flex-end;
+
+    gap: 3px;
+}
+
+.footer-brand-icon span {
+    display: block;
+
+    width: 7px;
+
+    background: white;
+}
+
+.footer-brand-icon span:nth-child(1) {
+    height: 14px;
+}
+
+.footer-brand-icon span:nth-child(2) {
+    height: 22px;
+}
+
+.footer-brand-icon span:nth-child(3) {
+    height: 31px;
+}
+
+.footer-brand p {
+    max-width: 260px;
+
+    font-size: 10px;
+
+    line-height: 1.55;
+
+    color: #d2dbe4;
+}
+
+.footer-column {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+.footer-column h4 {
+    color: white;
+
+    font-size: 13px;
+
+    margin-bottom: 5px;
+}
+
+.footer-column a,
+.footer-column p {
+    color: #e1e6ec;
+
+    font-size: 10px;
+}
+
+.footer-query {
+    color: var(--gold-light) !important;
+
+    font-weight: 800;
+
+    margin-top: 8px;
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(255,255,255,.18);
+}
+
+.footer-bottom-inner {
+    min-height: 32px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    font-size: 9px;
+
+    color: #d5dce4;
+}
+
+
+/* =====================================================
+   WHATSAPP
+===================================================== */
+
+.whatsapp {
+    position: fixed;
+
+    right: 22px;
+
+    bottom: 20px;
+
+    height: 47px;
+
+    padding: 0 18px 0 10px;
+
+    border-radius: 30px;
+
+    background: #20c76b;
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    box-shadow:
+        0 5px 18px rgba(0,0,0,.2);
+
+    z-index: 999;
+}
+
+.whatsapp-icon {
+    width: 29px;
+
+    height: 29px;
+
+    border: 2px solid white;
+
+    border-radius: 50%;
+
+    display: grid;
+
+    place-items: center;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 1050px) {
+
+    .navigation {
+        gap: 15px;
+    }
+
+    .navigation a {
+        font-size: 9px;
+    }
+
+    .hero-inner {
+        grid-template-columns: 52% 48%;
+    }
+
+    .hero h1 {
+        font-size: 46px;
+    }
+
+    .hero-trust {
+        gap: 15px;
     }
 
 }
 
 
-/* =====================================================
-   GET FORM DATA
-===================================================== */
+@media (max-width: 850px) {
 
-function getFormData() {
-
-    return {
-
-        name:
-            getValue("name"),
-
-        phone:
-            getValue("phone"),
-
-        email:
-            getValue("email"),
-
-        service:
-            getValue("service"),
-
-        message:
-            getValue("message")
-
-    };
-
-}
-
-
-/* =====================================================
-   GET VALUE
-===================================================== */
-
-function getValue(fieldId) {
-
-    const field =
-        document.getElementById(fieldId);
-
-
-    return field
-        ? field.value.trim()
-        : "";
-
-}
-
-
-/* =====================================================
-   VALIDATION
-===================================================== */
-
-function validateForm(data) {
-
-
-    const requiredFields = [
-
-        {
-            value: data.name,
-
-            message:
-                "Please enter your full name."
-        },
-
-        {
-            value: data.phone,
-
-            message:
-                "Please enter your mobile number."
-        },
-
-        {
-            value: data.email,
-
-            message:
-                "Please enter your email address."
-        },
-
-        {
-            value: data.service,
-
-            message:
-                "Please select a service."
-        },
-
-        {
-            value: data.message,
-
-            message:
-                "Please describe your requirement."
-        }
-
-    ];
-
-
-    for (const field of requiredFields) {
-
-        if (!field.value) {
-
-            return {
-
-                valid: false,
-
-                message:
-                    field.message
-
-            };
-
-        }
-
+    .navigation,
+    .header-cta {
+        display: none;
     }
 
-
-    if (!isValidPhone(data.phone)) {
-
-        return {
-
-            valid: false,
-
-            message:
-                "Please enter a valid 10-digit mobile number."
-
-        };
-
+    .mobile-menu {
+        display: block;
     }
 
-
-    if (!isValidEmail(data.email)) {
-
-        return {
-
-            valid: false,
-
-            message:
-                "Please enter a valid email address."
-
-        };
-
+    .hero-inner {
+        grid-template-columns: 1fr;
     }
 
-
-    return {
-
-        valid: true,
-
-        message: ""
-
-    };
-
-}
-
-
-/* =====================================================
-   PHONE
-===================================================== */
-
-function isValidPhone(phone) {
-
-    return /^[0-9]{10}$/.test(phone);
-
-}
-
-
-/* =====================================================
-   EMAIL
-===================================================== */
-
-function isValidEmail(email) {
-
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-}
-
-
-/* =====================================================
-   SEND TO GOOGLE APPS SCRIPT
-===================================================== */
-
-async function submitLead(data) {
-
-    return fetch(
-
-        CONFIG.googleScriptUrl,
-
-        {
-
-            method: "POST",
-
-            mode: "no-cors",
-
-            headers: {
-
-                "Content-Type":
-                    "text/plain;charset=utf-8"
-
-            },
-
-            body:
-                JSON.stringify(data)
-
-        }
-
-    );
-
-}
-
-
-/* =====================================================
-   SUCCESS
-===================================================== */
-
-function handleSubmissionSuccess(
-    submitButton,
-    originalButtonText
-) {
-
-    elements.form.reset();
-
-
-    showSuccessMessage(
-        CONFIG.successMessage
-    );
-
-
-    setButtonState(
-        submitButton,
-        true,
-        "Query Submitted ✓"
-    );
-
-
-    setTimeout(
-
-        function () {
-
-            hideSuccessMessage();
-
-
-            setButtonState(
-
-                submitButton,
-
-                false,
-
-                originalButtonText
-
-            );
-
-        },
-
-        CONFIG.successDisplayTime
-
-    );
-
-}
-
-
-/* =====================================================
-   ERROR
-===================================================== */
-
-function handleSubmissionError(
-    submitButton,
-    originalButtonText,
-    error
-) {
-
-    console.error(
-        "Lead submission error:",
-        error
-    );
-
-
-    hideSuccessMessage();
-
-
-    alert(
-        CONFIG.errorMessage
-    );
-
-
-    setButtonState(
-
-        submitButton,
-
-        false,
-
-        originalButtonText
-
-    );
-
-}
-
-
-/* =====================================================
-   BUTTON STATE
-===================================================== */
-
-function setButtonState(
-    button,
-    disabled,
-    text
-) {
-
-    if (!button) {
-        return;
+    .hero-content {
+        padding: 55px 0 35px;
     }
 
+    .hero-visual {
+        min-height: 300px;
 
-    button.disabled =
-        disabled;
-
-
-    button.innerHTML =
-        text;
-
-}
-
-
-/* =====================================================
-   SUCCESS MESSAGE
-===================================================== */
-
-function showSuccessMessage(message) {
-
-    if (!elements.successMessage) {
-        return;
+        margin-top: -5px;
     }
 
+    .hero-image {
+        height: 300px;
 
-    elements.successMessage.textContent =
-        message;
-
-
-    elements.successMessage.style.display =
-        "block";
-
-}
-
-
-/* =====================================================
-   HIDE SUCCESS
-===================================================== */
-
-function hideSuccessMessage() {
-
-    if (!elements.successMessage) {
-        return;
+        object-position: center;
     }
 
-
-    elements.successMessage.style.display =
-        "none";
-
-}
-
-
-/* =====================================================
-   VALIDATION ERROR
-===================================================== */
-
-function showValidationError(message) {
-
-    hideSuccessMessage();
-
-    alert(message);
-
-}
-
-
-/* =====================================================
-   MOBILE MENU
-===================================================== */
-
-function setupMobileMenu() {
-
-    if (!elements.menuButton) {
-        return;
+    .hero-visual::before {
+        width: 100px;
     }
 
+    .service-layout {
+        grid-template-columns: 1fr;
+    }
 
-    elements.menuButton.addEventListener(
+    .query-card {
+        max-width: 500px;
 
-        "click",
+        width: 100%;
 
-        function () {
+        margin: 25px auto 0;
+    }
 
-            alert(
-                "Please use the navigation links or scroll through the page."
-            );
+}
 
-        }
 
-    );
+@media (max-width: 650px) {
+
+    .container {
+        width: min(100% - 30px, 1180px);
+    }
+
+    .hero h1 {
+        font-size: 40px;
+    }
+
+    .hero-text {
+        font-size: 13px;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+    }
+
+    .hero-primary,
+    .hero-secondary {
+        width: 100%;
+    }
+
+    .hero-trust {
+        flex-wrap: wrap;
+
+        gap: 15px 20px;
+    }
+
+    .service-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .steps {
+        grid-template-columns: 1fr;
+
+        gap: 18px;
+    }
+
+    .step-arrow {
+        display: none;
+    }
+
+    .why-grid {
+        grid-template-columns: 1fr 1fr;
+
+        gap: 25px;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+}
+
+
+@media (max-width: 450px) {
+
+    .service-grid,
+    .why-grid,
+    .footer-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero h1 {
+        font-size: 35px;
+    }
+
+    .hero-visual {
+        min-height: 230px;
+    }
+
+    .hero-image {
+        height: 230px;
+    }
+
+    .footer-bottom-inner {
+        flex-direction: column;
+
+        justify-content: center;
+
+        gap: 5px;
+
+        padding: 8px 0;
+    }
+
+    .whatsapp {
+        right: 12px;
+
+        bottom: 12px;
+    }
 
 }
