@@ -1,1299 +1,536 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+/* =====================================================
+   CONFIGURATION
+===================================================== */
 
-:root {
-    --navy: #071b31;
-    --navy-2: #0b263f;
-    --gold: #e8a92f;
-    --gold-2: #f5c45b;
-    --text: #172235;
-    --muted: #596272;
-    --cream: #fbf7ef;
-    --border: #e5e8ed;
-    --white: #ffffff;
-}
+const CONFIG = {
 
-html {
-    scroll-behavior: smooth;
-}
+    googleScriptUrl:
+        "https://script.google.com/macros/s/AKfycbyMXxIzDaMR-yCFq3FJUyUYgjWnXy-PKU_ZnsOu4GOyCNMdHVapobi4sMt-Y6oiFpS6Ow/exec",
 
-body {
-    font-family: "Inter", sans-serif;
-    color: var(--text);
-    background: white;
-    line-height: 1.5;
-}
+    successMessage:
+        "Thank you! Your requirement has been submitted successfully. We will contact you shortly.",
 
-a {
-    text-decoration: none;
-    color: inherit;
-}
+    errorMessage:
+        "Something went wrong. Please try again or contact us directly.",
 
-button,
-input,
-textarea,
-select {
-    font-family: inherit;
-}
+    successDisplayTime: 6000
 
-.container {
-    width: min(1180px, calc(100% - 80px));
-    margin: auto;
+};
+
+
+/* =====================================================
+   DOM
+===================================================== */
+
+const elements = {
+
+    form:
+        document.getElementById("queryForm"),
+
+    successMessage:
+        document.getElementById("successMessage"),
+
+    menuButton:
+        document.getElementById("menuButton")
+
+};
+
+
+/* =====================================================
+   INITIALIZE
+===================================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    initialize
+);
+
+
+function initialize() {
+
+    setupFormSubmission();
+
+    setupMobileMenu();
+
 }
 
 
 /* =====================================================
-   HEADER
+   FORM SUBMISSION
 ===================================================== */
 
-.header {
-    height: 57px;
-    background: white;
-    border-bottom: 1px solid #e8e8e8;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
+function setupFormSubmission() {
 
-.header-inner {
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 30px;
-}
+    if (!elements.form) {
+        return;
+    }
 
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.brand-icon {
-    position: relative;
-    width: 38px;
-    height: 42px;
-}
-
-.bar {
-    position: absolute;
-    bottom: 0;
-    background: var(--navy);
-    width: 7px;
-}
-
-.bar-1 {
-    height: 15px;
-    left: 2px;
-}
-
-.bar-2 {
-    height: 24px;
-    left: 12px;
-}
-
-.bar-3 {
-    height: 34px;
-    left: 22px;
-}
-
-.arrow-line {
-    position: absolute;
-    width: 25px;
-    height: 4px;
-    background: var(--gold);
-    transform: rotate(-30deg);
-    top: 6px;
-    left: 9px;
-}
-
-.arrow-head {
-    position: absolute;
-    width: 9px;
-    height: 9px;
-    border-top: 4px solid var(--gold);
-    border-right: 4px solid var(--gold);
-    transform: rotate(15deg);
-    top: 1px;
-    right: 0;
-}
-
-.brand-name {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.02;
-}
-
-.brand-name strong {
-    font-size: 14px;
-    letter-spacing: .2px;
-}
-
-.brand-name span {
-    font-size: 14px;
-    font-weight: 800;
-}
-
-.navigation {
-    display: flex;
-    align-items: center;
-    gap: 27px;
-    font-size: 11px;
-    font-weight: 600;
-}
-
-.navigation a {
-    position: relative;
-    color: #101827;
-    padding: 20px 0 17px;
-}
-
-.navigation a.active::after {
-    content: "";
-    position: absolute;
-    height: 2px;
-    background: var(--gold);
-    left: 0;
-    right: 0;
-    bottom: 8px;
-}
-
-.header-cta {
-    background: linear-gradient(
-        180deg,
-        #f4c15b,
-        #e4a42d
+    elements.form.addEventListener(
+        "submit",
+        handleFormSubmit
     );
 
-    color: #111;
-
-    font-size: 11px;
-    font-weight: 800;
-
-    padding: 10px 19px;
-
-    border-radius: 5px;
-
-    white-space: nowrap;
-
-    box-shadow:
-        0 3px 10px rgba(228,164,45,.2);
-}
-
-.mobile-menu {
-    display: none;
-    border: 0;
-    background: none;
-    font-size: 22px;
 }
 
 
 /* =====================================================
-   HERO
+   HANDLE FORM
 ===================================================== */
 
-.hero {
-    position: relative;
-    min-height: 420px;
-    background:
-        radial-gradient(
-            circle at 75% 35%,
-            rgba(26,73,105,.45),
-            transparent 35%
-        ),
-        linear-gradient(
-            100deg,
-            #061a2e 0%,
-            #08213a 48%,
-            #0d3049 100%
+async function handleFormSubmit(event) {
+
+    event.preventDefault();
+
+
+    const formData =
+        getFormData();
+
+
+    const validation =
+        validateForm(formData);
+
+
+    if (!validation.valid) {
+
+        showValidationError(
+            validation.message
         );
 
-    overflow: hidden;
-    color: white;
-}
+        return;
+    }
 
-.hero::after {
-    content: "";
-    position: absolute;
-    width: 520px;
-    height: 520px;
-    right: -180px;
-    top: -130px;
-    background:
-        radial-gradient(
-            circle,
-            rgba(233,174,58,.13),
-            transparent 68%
-        );
-}
 
-.hero-inner {
-    min-height: 420px;
-
-    display: grid;
-
-    grid-template-columns:
-        1.02fr .98fr;
-
-    align-items: center;
-
-    position: relative;
-
-    z-index: 2;
-}
-
-.hero-content {
-    padding: 38px 0 35px;
-}
-
-.hero-eyebrow {
-    font-size: 11px;
-    letter-spacing: .6px;
-    color: #e8edf3;
-    margin-bottom: 12px;
-}
-
-.hero h1 {
-    font-family: "Playfair Display", serif;
-    font-size: clamp(42px, 4.4vw, 57px);
-    line-height: 1.02;
-    margin-bottom: 15px;
-    max-width: 620px;
-}
-
-.hero h1 span {
-    color: var(--gold-2);
-}
-
-.hero-text {
-    font-size: 14px;
-    line-height: 1.48;
-    color: #f1f4f7;
-    max-width: 575px;
-    margin-bottom: 19px;
-}
-
-.hero-buttons {
-    display: flex;
-    gap: 11px;
-    margin-bottom: 25px;
-}
-
-.hero-primary,
-.hero-secondary {
-    height: 43px;
-    padding: 0 20px;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 5px;
-
-    font-size: 12px;
-    font-weight: 800;
-}
-
-.hero-primary {
-    background:
-        linear-gradient(
-            180deg,
-            #f5c45b,
-            #e8a92f
+    const submitButton =
+        elements.form.querySelector(
+            ".submit-button"
         );
 
-    color: #111;
-}
 
-.hero-primary span {
-    margin-left: 12px;
-    font-size: 17px;
-}
-
-.hero-secondary {
-    border: 1px solid white;
-    color: white;
-}
-
-.hero-trust {
-    display: flex;
-    gap: 28px;
-}
-
-.trust-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.trust-icon {
-    color: var(--gold-2);
-    font-size: 25px;
-    line-height: 1;
-}
-
-.trust-item strong,
-.trust-item span {
-    display: block;
-    font-size: 11px;
-}
-
-.trust-item span {
-    color: #e3e8ee;
-}
+    const originalButtonText =
+        submitButton.innerHTML;
 
 
-/* =====================================================
-   HERO VISUAL
-===================================================== */
+    setButtonState(
+        submitButton,
+        true,
+        "Submitting..."
+    );
 
-.hero-visual {
-    height: 420px;
-    position: relative;
-    overflow: hidden;
-}
 
-.hero-image-card {
-    position: absolute;
-    width: 580px;
-    height: 390px;
-    right: -70px;
-    top: 15px;
+    try {
 
-    background:
-        linear-gradient(
-            145deg,
-            #d7b88b,
-            #e8d5b8 45%,
-            #b89363
+        await submitLead(formData);
+
+
+        handleSubmissionSuccess(
+            submitButton,
+            originalButtonText
         );
 
-    box-shadow:
-        -15px 15px 50px rgba(0,0,0,.28);
 
-    transform: rotate(-1deg);
-}
+    } catch (error) {
 
-
-/* marketplace screen */
-
-.market-screen {
-    position: absolute;
-    right: 8px;
-    top: 23px;
-
-    width: 300px;
-    height: 190px;
-
-    background: #eef2f3;
-
-    border-radius: 5px;
-
-    border: 6px solid #252b31;
-
-    box-shadow: 0 10px 20px rgba(0,0,0,.25);
-}
-
-.screen-header {
-    height: 33px;
-
-    padding: 9px;
-
-    display: flex;
-    justify-content: space-between;
-
-    font-size: 8px;
-    font-weight: 800;
-
-    color: #24384a;
-}
-
-.screen-dots {
-    font-size: 5px;
-}
-
-.product-grid {
-    display: flex;
-    gap: 8px;
-    padding: 8px;
-}
-
-.product-item {
-    width: 82px;
-    height: 115px;
-    background: white;
-    display: grid;
-    place-items: center;
-}
-
-.product-shape {
-    font-size: 42px;
-    color: #22374a;
-}
-
-
-/* GeM document */
-
-.gem-document {
-    position: absolute;
-
-    left: 40px;
-    top: 120px;
-
-    width: 235px;
-
-    background: #fafafa;
-
-    padding: 18px 17px 17px;
-
-    box-shadow:
-        0 15px 25px rgba(0,0,0,.25);
-
-    transform:
-        rotate(-7deg);
-}
-
-.gem-logo {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    margin-bottom: 12px;
-}
-
-.gem-star {
-    font-size: 29px;
-    color: #e5a82d;
-}
-
-.gem-logo strong {
-    font-size: 21px;
-    color: #27384a;
-}
-
-.gem-logo small {
-    display: block;
-    font-size: 6px;
-    line-height: 1.05;
-}
-
-.gem-list {
-    display: grid;
-    gap: 7px;
-}
-
-.gem-list div {
-    display: flex;
-    gap: 7px;
-    align-items: center;
-    font-size: 9px;
-}
-
-.gem-list div:first-letter {
-    background: #112d45;
-    color: white;
-}
-
-.gem-list span {
-    color: #293743;
-}
-
-
-/* growth book */
-
-.growth-book {
-    position: absolute;
-    right: 90px;
-    bottom: 2px;
-
-    width: 165px;
-    height: 105px;
-
-    background:
-        linear-gradient(
-            145deg,
-            #0c1d31,
-            #162d43
+        handleSubmissionError(
+            submitButton,
+            originalButtonText,
+            error
         );
 
-    color: var(--gold-2);
+    }
 
-    padding: 35px 18px;
-
-    font-size: 14px;
-    font-weight: 800;
-
-    transform: rotate(-8deg);
-
-    box-shadow:
-        0 10px 25px rgba(0,0,0,.3);
-}
-
-.growth-book span {
-    margin-left: 18px;
-}
-
-.growth-bars {
-    position: absolute;
-    right: 10px;
-    bottom: 45px;
-
-    display: flex;
-    align-items: flex-end;
-    gap: 5px;
-
-    transform: rotate(-3deg);
-}
-
-.growth-bars i {
-    display: block;
-    width: 8px;
-    background: var(--gold);
-}
-
-.growth-bars i:nth-child(1) {
-    height: 22px;
-}
-
-.growth-bars i:nth-child(2) {
-    height: 35px;
-}
-
-.growth-bars i:nth-child(3) {
-    height: 49px;
-}
-
-.growth-bars i:nth-child(4) {
-    height: 65px;
-}
-
-.growth-bars i:nth-child(5) {
-    height: 82px;
 }
 
 
 /* =====================================================
-   SERVICES
+   GET FORM DATA
 ===================================================== */
 
-.services-section {
-    padding: 25px 0 30px;
-    background: white;
-}
+function getFormData() {
 
-.service-layout {
-    display: grid;
-    grid-template-columns: 1fr 310px;
-    gap: 12px;
-    align-items: start;
-}
+    return {
 
-.services-left {
-    min-width: 0;
-}
+        name:
+            getValue("name"),
 
-.section-title {
-    margin-bottom: 13px;
-}
+        phone:
+            getValue("phone"),
 
-.section-title h2 {
-    font-family: "Playfair Display", serif;
-    font-size: 31px;
-    color: var(--navy);
-    line-height: 1.1;
-}
+        email:
+            getValue("email"),
 
-.section-title p {
-    font-size: 14px;
-    color: #5c6470;
-    margin-top: 2px;
-}
+        service:
+            getValue("service"),
 
-.service-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-}
+        message:
+            getValue("message")
 
-.service-card {
-    min-height: 125px;
+    };
 
-    border: 1px solid #e4e7eb;
-    border-radius: 7px;
-
-    padding: 18px;
-
-    background: white;
-
-    box-shadow:
-        0 2px 8px rgba(0,0,0,.035);
-
-    transition: .2s;
-}
-
-.service-card:hover {
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 8px 20px rgba(7,27,49,.08);
-
-    border-color: #d9ad53;
-}
-
-.service-icon {
-    font-size: 26px;
-    color: var(--navy);
-    margin-bottom: 6px;
-}
-
-.service-card h3 {
-    color: #101b2c;
-    font-size: 12px;
-    line-height: 1.35;
-    margin-bottom: 7px;
-}
-
-.service-card p {
-    color: #626b78;
-    font-size: 10px;
-    line-height: 1.45;
 }
 
 
 /* =====================================================
-   QUERY FORM
+   GET VALUE
 ===================================================== */
 
-.query-card {
-    background: white;
+function getValue(fieldId) {
 
-    border: 1px solid #e4e7eb;
+    const field =
+        document.getElementById(fieldId);
 
-    border-radius: 7px;
 
-    padding: 17px;
+    return field
+        ? field.value.trim()
+        : "";
 
-    box-shadow:
-        0 4px 18px rgba(7,27,49,.07);
-
-    margin-top: 0;
-}
-
-.query-heading h2 {
-    font-family: "Playfair Display", serif;
-
-    font-size: 21px;
-
-    color: var(--navy);
-
-    line-height: 1.1;
-}
-
-.query-heading p {
-    font-size: 10px;
-    color: #5c6470;
-    margin: 4px 0 13px;
-}
-
-.input-box {
-    height: 35px;
-
-    border: 1px solid #dce1e7;
-
-    border-radius: 5px;
-
-    margin-bottom: 8px;
-
-    display: flex;
-    align-items: center;
-
-    position: relative;
-
-    background: white;
-}
-
-.input-icon {
-    width: 33px;
-    text-align: center;
-
-    color: #566275;
-
-    font-size: 14px;
-}
-
-.input-box input,
-.input-box select,
-.input-box textarea {
-    width: 100%;
-
-    height: 100%;
-
-    border: 0;
-    outline: 0;
-
-    background: transparent;
-
-    color: #3d4653;
-
-    font-size: 10px;
-
-    padding-right: 10px;
-}
-
-.input-box textarea {
-    resize: none;
-    padding-top: 9px;
-}
-
-.textarea-box {
-    height: 62px;
-    align-items: flex-start;
-}
-
-.textarea-box .input-icon {
-    padding-top: 9px;
-}
-
-.select-arrow {
-    position: absolute;
-    right: 10px;
-    pointer-events: none;
-    color: #5e6875;
-}
-
-.upload-small {
-    height: 42px;
-
-    border: 1px dashed #cdd3db;
-
-    background: #fafafa;
-
-    border-radius: 5px;
-
-    margin-bottom: 8px;
-
-    display: flex;
-    align-items: center;
-
-    gap: 8px;
-
-    padding: 7px;
-
-    position: relative;
-
-    overflow: hidden;
-}
-
-.upload-small > span {
-    font-size: 17px;
-}
-
-.upload-small strong,
-.upload-small small {
-    display: block;
-}
-
-.upload-small strong {
-    font-size: 9px;
-}
-
-.upload-small small {
-    font-size: 7px;
-    color: #87909d;
-}
-
-.upload-small input {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    cursor: pointer;
-}
-
-.submit-button {
-    width: 100%;
-    height: 40px;
-
-    border: 0;
-    border-radius: 5px;
-
-    background:
-        linear-gradient(
-            180deg,
-            #f5c45b,
-            #e8a92f
-        );
-
-    color: #111;
-
-    font-size: 11px;
-    font-weight: 800;
-
-    cursor: pointer;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-}
-
-.submit-button:hover {
-    filter: brightness(.97);
-}
-
-.submit-button:disabled {
-    opacity: .65;
-}
-
-.success-message {
-    display: none;
-
-    padding: 8px;
-    margin-top: 8px;
-
-    border-radius: 4px;
-
-    background: #edf8ef;
-
-    color: #28743d;
-
-    font-size: 9px;
-
-    text-align: center;
-}
-
-.form-security {
-    text-align: center;
-
-    font-size: 8px;
-
-    color: #707986;
-
-    padding-top: 8px;
 }
 
 
 /* =====================================================
-   HOW IT WORKS
+   VALIDATION
 ===================================================== */
 
-.how-section {
-    padding: 18px 0 28px;
-    background: white;
-}
+function validateForm(data) {
 
-.center-heading {
-    text-align: center;
-    margin-bottom: 20px;
-}
 
-.center-heading h2 {
-    font-family: "Playfair Display", serif;
-    color: var(--navy);
-    font-size: 28px;
-    line-height: 1.15;
-}
+    const requiredFields = [
 
-.center-heading p {
-    font-size: 13px;
-    color: #626b78;
-}
+        {
+            value: data.name,
 
-.steps {
-    display: grid;
+            message:
+                "Please enter your full name."
+        },
 
-    grid-template-columns:
-        1fr 25px 1fr 25px 1fr;
+        {
+            value: data.phone,
 
-    align-items: center;
+            message:
+                "Please enter your mobile number."
+        },
 
-    gap: 12px;
-}
+        {
+            value: data.email,
 
-.step {
-    display: grid;
+            message:
+                "Please enter your email address."
+        },
 
-    grid-template-columns:
-        35px 45px 1fr;
+        {
+            value: data.service,
 
-    gap: 10px;
+            message:
+                "Please select a service."
+        },
 
-    align-items: center;
-}
+        {
+            value: data.message,
 
-.step-number {
-    width: 35px;
-    height: 35px;
+            message:
+                "Please describe your requirement."
+        }
 
-    background: var(--navy);
+    ];
 
-    color: white;
 
-    border-radius: 50%;
+    for (const field of requiredFields) {
 
-    display: grid;
-    place-items: center;
+        if (!field.value) {
 
-    font-weight: 800;
-    font-size: 13px;
-}
+            return {
 
-.step-icon {
-    font-size: 31px;
-    color: var(--navy);
-}
+                valid: false,
 
-.step h3 {
-    font-size: 12px;
-    color: #152033;
-    margin-bottom: 4px;
-}
+                message:
+                    field.message
 
-.step p {
-    font-size: 10px;
-    color: #68717e;
-    line-height: 1.4;
-}
+            };
 
-.step-arrow {
-    font-size: 29px;
-    color: var(--navy);
-    text-align: center;
+        }
+
+    }
+
+
+    if (!isValidPhone(data.phone)) {
+
+        return {
+
+            valid: false,
+
+            message:
+                "Please enter a valid 10-digit mobile number."
+
+        };
+
+    }
+
+
+    if (!isValidEmail(data.email)) {
+
+        return {
+
+            valid: false,
+
+            message:
+                "Please enter a valid email address."
+
+        };
+
+    }
+
+
+    return {
+
+        valid: true,
+
+        message: ""
+
+    };
+
 }
 
 
 /* =====================================================
-   WHY US
+   PHONE
 ===================================================== */
 
-.why-section {
-    padding: 20px 0 25px;
-    background: var(--cream);
-}
+function isValidPhone(phone) {
 
-.why-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 35px;
-}
+    return /^[0-9]{10}$/.test(phone);
 
-.why-item {
-    text-align: center;
-}
-
-.why-icon {
-    color: #c88615;
-    font-size: 38px;
-    line-height: 1;
-    margin-bottom: 10px;
-}
-
-.why-item h3 {
-    font-size: 13px;
-    color: var(--navy);
-    margin-bottom: 5px;
-}
-
-.why-item p {
-    font-size: 10px;
-    color: #555e6b;
-    line-height: 1.45;
 }
 
 
 /* =====================================================
-   FOOTER
+   EMAIL
 ===================================================== */
 
-.footer {
-    background:
-        linear-gradient(
-            135deg,
-            #06192b,
-            #09263d
-        );
+function isValidEmail(email) {
 
-    color: white;
-}
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-.footer-grid {
-    padding: 28px 0 25px;
-
-    display: grid;
-
-    grid-template-columns:
-        1.5fr 1fr 1fr 1fr;
-
-    gap: 35px;
-}
-
-.footer-brand-title {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    margin-bottom: 10px;
-}
-
-.footer-brand-title strong {
-    display: block;
-    font-size: 14px;
-    line-height: 1.05;
-}
-
-.footer-brand-icon {
-    width: 34px;
-    height: 34px;
-    display: flex;
-    align-items: flex-end;
-    gap: 3px;
-}
-
-.footer-brand-icon span {
-    display: block;
-    width: 7px;
-    background: white;
-}
-
-.footer-brand-icon span:nth-child(1) {
-    height: 14px;
-}
-
-.footer-brand-icon span:nth-child(2) {
-    height: 22px;
-}
-
-.footer-brand-icon span:nth-child(3) {
-    height: 31px;
-}
-
-.footer-brand p {
-    max-width: 260px;
-    font-size: 10px;
-    line-height: 1.55;
-    color: #d2dbe4;
-}
-
-.footer-column {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.footer-column h4 {
-    color: white;
-    font-size: 13px;
-    margin-bottom: 5px;
-}
-
-.footer-column a,
-.footer-column p {
-    color: #e1e6ec;
-    font-size: 10px;
-}
-
-.footer-query {
-    color: var(--gold-2) !important;
-    font-weight: 800;
-    margin-top: 8px;
-}
-
-.footer-bottom {
-    border-top: 1px solid rgba(255,255,255,.18);
-}
-
-.footer-bottom-inner {
-    min-height: 32px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    font-size: 9px;
-
-    color: #d5dce4;
 }
 
 
 /* =====================================================
-   WHATSAPP
+   SEND TO GOOGLE APPS SCRIPT
 ===================================================== */
 
-.whatsapp {
-    position: fixed;
+async function submitLead(data) {
 
-    right: 22px;
-    bottom: 20px;
+    return fetch(
 
-    height: 47px;
+        CONFIG.googleScriptUrl,
 
-    padding: 0 18px 0 10px;
+        {
 
-    border-radius: 30px;
+            method: "POST",
 
-    background: #20c76b;
+            mode: "no-cors",
 
-    color: white;
+            headers: {
 
-    display: flex;
-    align-items: center;
+                "Content-Type":
+                    "text/plain;charset=utf-8"
 
-    gap: 8px;
+            },
 
-    font-size: 10px;
-    font-weight: 800;
+            body:
+                JSON.stringify(data)
 
-    box-shadow:
-        0 5px 18px rgba(0,0,0,.2);
+        }
 
-    z-index: 999;
-}
+    );
 
-.whatsapp-icon {
-    width: 29px;
-    height: 29px;
-
-    border: 2px solid white;
-
-    border-radius: 50%;
-
-    display: grid;
-    place-items: center;
 }
 
 
 /* =====================================================
-   RESPONSIVE
+   SUCCESS
 ===================================================== */
 
-@media (max-width: 1000px) {
+function handleSubmissionSuccess(
+    submitButton,
+    originalButtonText
+) {
 
-    .navigation {
-        gap: 14px;
-    }
-
-    .navigation a {
-        font-size: 9px;
-    }
-
-    .hero-inner {
-        grid-template-columns: 1fr;
-    }
-
-    .hero {
-        padding-bottom: 0;
-    }
-
-    .hero-visual {
-        display: none;
-    }
-
-    .service-layout {
-        grid-template-columns: 1fr;
-    }
-
-    .query-card {
-        max-width: 500px;
-        margin: 25px auto 0;
-    }
-
-}
+    elements.form.reset();
 
 
-@media (max-width: 750px) {
+    showSuccessMessage(
+        CONFIG.successMessage
+    );
 
-    .container {
-        width: min(100% - 30px, 1180px);
-    }
 
-    .navigation,
-    .header-cta {
-        display: none;
-    }
+    setButtonState(
+        submitButton,
+        true,
+        "Query Submitted ✓"
+    );
 
-    .mobile-menu {
-        display: block;
-    }
 
-    .hero {
-        min-height: auto;
-    }
+    setTimeout(
 
-    .hero-inner {
-        min-height: auto;
-    }
+        function () {
 
-    .hero-content {
-        padding: 55px 0;
-    }
+            hideSuccessMessage();
 
-    .hero h1 {
-        font-size: 42px;
-    }
 
-    .hero-trust {
-        flex-wrap: wrap;
-        gap: 15px 20px;
-    }
+            setButtonState(
 
-    .service-grid {
-        grid-template-columns: 1fr 1fr;
-    }
+                submitButton,
 
-    .steps {
-        grid-template-columns: 1fr;
-        gap: 18px;
-    }
+                false,
 
-    .step-arrow {
-        display: none;
-    }
+                originalButtonText
 
-    .why-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 25px;
-    }
+            );
 
-    .footer-grid {
-        grid-template-columns: 1fr 1fr;
-    }
+        },
+
+        CONFIG.successDisplayTime
+
+    );
 
 }
 
 
-@media (max-width: 500px) {
+/* =====================================================
+   ERROR
+===================================================== */
 
-    .service-grid {
-        grid-template-columns: 1fr;
+function handleSubmissionError(
+    submitButton,
+    originalButtonText,
+    error
+) {
+
+    console.error(
+        "Lead submission error:",
+        error
+    );
+
+
+    hideSuccessMessage();
+
+
+    alert(
+        CONFIG.errorMessage
+    );
+
+
+    setButtonState(
+
+        submitButton,
+
+        false,
+
+        originalButtonText
+
+    );
+
+}
+
+
+/* =====================================================
+   BUTTON STATE
+===================================================== */
+
+function setButtonState(
+    button,
+    disabled,
+    text
+) {
+
+    if (!button) {
+        return;
     }
 
-    .why-grid {
-        grid-template-columns: 1fr;
+
+    button.disabled =
+        disabled;
+
+
+    button.innerHTML =
+        text;
+
+}
+
+
+/* =====================================================
+   SUCCESS MESSAGE
+===================================================== */
+
+function showSuccessMessage(message) {
+
+    if (!elements.successMessage) {
+        return;
     }
 
-    .footer-grid {
-        grid-template-columns: 1fr;
+
+    elements.successMessage.textContent =
+        message;
+
+
+    elements.successMessage.style.display =
+        "block";
+
+}
+
+
+/* =====================================================
+   HIDE SUCCESS
+===================================================== */
+
+function hideSuccessMessage() {
+
+    if (!elements.successMessage) {
+        return;
     }
 
-    .footer-bottom-inner {
-        flex-direction: column;
-        justify-content: center;
-        gap: 5px;
-        padding: 8px 0;
+
+    elements.successMessage.style.display =
+        "none";
+
+}
+
+
+/* =====================================================
+   VALIDATION ERROR
+===================================================== */
+
+function showValidationError(message) {
+
+    hideSuccessMessage();
+
+    alert(message);
+
+}
+
+
+/* =====================================================
+   MOBILE MENU
+===================================================== */
+
+function setupMobileMenu() {
+
+    if (!elements.menuButton) {
+        return;
     }
 
-    .hero-buttons {
-        flex-direction: column;
-    }
 
-    .hero-primary,
-    .hero-secondary {
-        width: 100%;
-    }
+    elements.menuButton.addEventListener(
 
-    .whatsapp {
-        right: 12px;
-        bottom: 12px;
-    }
+        "click",
+
+        function () {
+
+            alert(
+                "Please use the navigation links or scroll through the page."
+            );
+
+        }
+
+    );
 
 }
