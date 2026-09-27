@@ -1,8 +1,9 @@
-/* =========================================================
+/* =====================================================
    CONFIGURATION
-========================================================= */
+===================================================== */
 
 const CONFIG = {
+
     googleScriptUrl:
         "https://script.google.com/macros/s/AKfycbyMXxIzDaMR-yCFq3FJUyUYgjWnXy-PKU_ZnsOu4GOyCNMdHVapobi4sMt-Y6oiFpS6Ow/exec",
 
@@ -13,38 +14,50 @@ const CONFIG = {
         "Something went wrong. Please try again or contact us directly.",
 
     successDisplayTime: 6000
+
 };
 
 
-/* =========================================================
-   DOM ELEMENTS
-========================================================= */
+/* =====================================================
+   DOM
+===================================================== */
 
 const elements = {
-    form: document.getElementById("queryForm"),
-    successMessage: document.getElementById("successMessage"),
-    menuButton: document.getElementById("menuButton")
+
+    form:
+        document.getElementById("queryForm"),
+
+    successMessage:
+        document.getElementById("successMessage"),
+
+    menuButton:
+        document.getElementById("menuButton")
+
 };
 
 
-/* =========================================================
+/* =====================================================
    INITIALIZE
-========================================================= */
+===================================================== */
 
-document.addEventListener("DOMContentLoaded", initialize);
+document.addEventListener(
+    "DOMContentLoaded",
+    initialize
+);
 
 
 function initialize() {
 
     setupFormSubmission();
+
     setupMobileMenu();
 
 }
 
 
-/* =========================================================
+/* =====================================================
    FORM SUBMISSION
-========================================================= */
+===================================================== */
 
 function setupFormSubmission() {
 
@@ -60,30 +73,42 @@ function setupFormSubmission() {
 }
 
 
-/* =========================================================
-   HANDLE FORM SUBMIT
-========================================================= */
+/* =====================================================
+   HANDLE FORM
+===================================================== */
 
 async function handleFormSubmit(event) {
 
     event.preventDefault();
 
-    const formData = getFormData();
 
-    const validation = validateForm(formData);
+    const formData =
+        getFormData();
+
+
+    const validation =
+        validateForm(formData);
+
 
     if (!validation.valid) {
 
-        showValidationError(validation.message);
+        showValidationError(
+            validation.message
+        );
 
         return;
     }
 
+
     const submitButton =
-        elements.form.querySelector(".submit-button");
+        elements.form.querySelector(
+            ".submit-button"
+        );
+
 
     const originalButtonText =
         submitButton.innerHTML;
+
 
     setButtonState(
         submitButton,
@@ -91,14 +116,17 @@ async function handleFormSubmit(event) {
         "Submitting..."
     );
 
+
     try {
 
         await submitLead(formData);
+
 
         handleSubmissionSuccess(
             submitButton,
             originalButtonText
         );
+
 
     } catch (error) {
 
@@ -113,31 +141,43 @@ async function handleFormSubmit(event) {
 }
 
 
-/* =========================================================
+/* =====================================================
    GET FORM DATA
-========================================================= */
+===================================================== */
 
 function getFormData() {
 
     return {
-        name: getValue("name"),
-        phone: getValue("phone"),
-        email: getValue("email"),
-        service: getValue("service"),
-        message: getValue("message")
+
+        name:
+            getValue("name"),
+
+        phone:
+            getValue("phone"),
+
+        email:
+            getValue("email"),
+
+        service:
+            getValue("service"),
+
+        message:
+            getValue("message")
+
     };
 
 }
 
 
-/* =========================================================
-   GET FIELD VALUE
-========================================================= */
+/* =====================================================
+   GET VALUE
+===================================================== */
 
 function getValue(fieldId) {
 
     const field =
         document.getElementById(fieldId);
+
 
     return field
         ? field.value.trim()
@@ -146,47 +186,64 @@ function getValue(fieldId) {
 }
 
 
-/* =========================================================
+/* =====================================================
    VALIDATION
-========================================================= */
+===================================================== */
 
 function validateForm(data) {
 
+
     const requiredFields = [
+
         {
             value: data.name,
-            message: "Please enter your full name."
+
+            message:
+                "Please enter your full name."
         },
+
         {
             value: data.phone,
-            message: "Please enter your mobile number."
+
+            message:
+                "Please enter your mobile number."
         },
+
         {
             value: data.email,
-            message: "Please enter your email address."
+
+            message:
+                "Please enter your email address."
         },
+
         {
             value: data.service,
-            message: "Please select a service."
+
+            message:
+                "Please select a service."
         },
+
         {
             value: data.message,
-            message: "Please describe your requirement."
+
+            message:
+                "Please describe your requirement."
         }
+
     ];
 
-
-    /* ---------------------------------------------
-       REQUIRED FIELD CHECK
-    --------------------------------------------- */
 
     for (const field of requiredFields) {
 
         if (!field.value) {
 
             return {
+
                 valid: false,
-                message: field.message
+
+                message:
+                    field.message
+
             };
 
         }
@@ -194,47 +251,48 @@ function validateForm(data) {
     }
 
 
-    /* ---------------------------------------------
-       PHONE VALIDATION
-    --------------------------------------------- */
-
     if (!isValidPhone(data.phone)) {
 
         return {
+
             valid: false,
+
             message:
                 "Please enter a valid 10-digit mobile number."
+
         };
 
     }
 
 
-    /* ---------------------------------------------
-       EMAIL VALIDATION
-    --------------------------------------------- */
-
     if (!isValidEmail(data.email)) {
 
         return {
+
             valid: false,
+
             message:
                 "Please enter a valid email address."
+
         };
 
     }
 
 
     return {
+
         valid: true,
+
         message: ""
+
     };
 
 }
 
 
-/* =========================================================
-   PHONE VALIDATION
-========================================================= */
+/* =====================================================
+   PHONE
+===================================================== */
 
 function isValidPhone(phone) {
 
@@ -243,9 +301,9 @@ function isValidPhone(phone) {
 }
 
 
-/* =========================================================
-   EMAIL VALIDATION
-========================================================= */
+/* =====================================================
+   EMAIL
+===================================================== */
 
 function isValidEmail(email) {
 
@@ -254,45 +312,42 @@ function isValidEmail(email) {
 }
 
 
-/* =========================================================
-   SUBMIT LEAD TO GOOGLE APPS SCRIPT
-========================================================= */
+/* =====================================================
+   SEND TO GOOGLE APPS SCRIPT
+===================================================== */
 
 async function submitLead(data) {
 
-    const response = await fetch(
+    return fetch(
+
         CONFIG.googleScriptUrl,
+
         {
+
             method: "POST",
 
             mode: "no-cors",
 
             headers: {
+
                 "Content-Type":
                     "text/plain;charset=utf-8"
+
             },
 
-            body: JSON.stringify(data)
+            body:
+                JSON.stringify(data)
+
         }
+
     );
-
-
-    /*
-       With no-cors, the browser does not expose the
-       response body/status to JavaScript.
-
-       If fetch completes without throwing an error,
-       we treat the request as submitted.
-    */
-
-    return response;
 
 }
 
 
-/* =========================================================
-   SUCCESS HANDLER
-========================================================= */
+/* =====================================================
+   SUCCESS
+===================================================== */
 
 function handleSubmissionSuccess(
     submitButton,
@@ -301,9 +356,11 @@ function handleSubmissionSuccess(
 
     elements.form.reset();
 
+
     showSuccessMessage(
         CONFIG.successMessage
     );
+
 
     setButtonState(
         submitButton,
@@ -313,26 +370,34 @@ function handleSubmissionSuccess(
 
 
     setTimeout(
+
         function () {
 
             hideSuccessMessage();
 
+
             setButtonState(
+
                 submitButton,
+
                 false,
+
                 originalButtonText
+
             );
 
         },
+
         CONFIG.successDisplayTime
+
     );
 
 }
 
 
-/* =========================================================
-   ERROR HANDLER
-========================================================= */
+/* =====================================================
+   ERROR
+===================================================== */
 
 function handleSubmissionError(
     submitButton,
@@ -345,22 +410,31 @@ function handleSubmissionError(
         error
     );
 
+
     hideSuccessMessage();
 
-    alert(CONFIG.errorMessage);
+
+    alert(
+        CONFIG.errorMessage
+    );
+
 
     setButtonState(
+
         submitButton,
+
         false,
+
         originalButtonText
+
     );
 
 }
 
 
-/* =========================================================
+/* =====================================================
    BUTTON STATE
-========================================================= */
+===================================================== */
 
 function setButtonState(
     button,
@@ -372,15 +446,20 @@ function setButtonState(
         return;
     }
 
-    button.disabled = disabled;
-    button.innerHTML = text;
+
+    button.disabled =
+        disabled;
+
+
+    button.innerHTML =
+        text;
 
 }
 
 
-/* =========================================================
+/* =====================================================
    SUCCESS MESSAGE
-========================================================= */
+===================================================== */
 
 function showSuccessMessage(message) {
 
@@ -388,8 +467,10 @@ function showSuccessMessage(message) {
         return;
     }
 
+
     elements.successMessage.textContent =
         message;
+
 
     elements.successMessage.style.display =
         "block";
@@ -397,9 +478,9 @@ function showSuccessMessage(message) {
 }
 
 
-/* =========================================================
-   HIDE SUCCESS MESSAGE
-========================================================= */
+/* =====================================================
+   HIDE SUCCESS
+===================================================== */
 
 function hideSuccessMessage() {
 
@@ -407,15 +488,16 @@ function hideSuccessMessage() {
         return;
     }
 
+
     elements.successMessage.style.display =
         "none";
 
 }
 
 
-/* =========================================================
+/* =====================================================
    VALIDATION ERROR
-========================================================= */
+===================================================== */
 
 function showValidationError(message) {
 
@@ -426,9 +508,9 @@ function showValidationError(message) {
 }
 
 
-/* =========================================================
+/* =====================================================
    MOBILE MENU
-========================================================= */
+===================================================== */
 
 function setupMobileMenu() {
 
@@ -436,21 +518,19 @@ function setupMobileMenu() {
         return;
     }
 
-    elements.menuButton.addEventListener(
-        "click",
-        function () {
 
-            /*
-               Mobile navigation can be upgraded here later.
-               Keeping this separate prevents menu logic from
-               interfering with form submission.
-            */
+    elements.menuButton.addEventListener(
+
+        "click",
+
+        function () {
 
             alert(
                 "Please use the navigation links or scroll through the page."
             );
 
         }
+
     );
 
 }
